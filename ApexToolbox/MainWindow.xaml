@@ -107,16 +107,34 @@
                                     <Border Style="{StaticResource Card}" Margin="0,0,8,8">
                                         <StackPanel>
                                             <StackPanel Orientation="Horizontal">
-                                                <Border Width="64" Height="64" CornerRadius="32">
-                                                    <Border.Background>
-                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                            <GradientStop Color="#E23B2E" Offset="0" />
-                                                            <GradientStop Color="#7A1B14" Offset="1" />
-                                                        </LinearGradientBrush>
-                                                    </Border.Background>
+                                                <Grid Width="64" Height="64">
+                                                    <Border CornerRadius="32">
+                                                        <Border.Background>
+                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                <GradientStop Color="#E23B2E" Offset="0" />
+                                                                <GradientStop Color="#7A1B14" Offset="1" />
+                                                            </LinearGradientBrush>
+                                                        </Border.Background>
+                                                    </Border>
+                                                    <Border CornerRadius="32" ClipToBounds="True">
+                                                        <Border.Background>
+                                                            <ImageBrush ImageSource="{Binding Avatar}" Stretch="UniformToFill" />
+                                                        </Border.Background>
+                                                    </Border>
                                                     <TextBlock Text="{Binding Initial}" FontSize="28" FontWeight="Bold" Foreground="White"
-                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                </Border>
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Avatar}" Value="">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
                                                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding Name}" Style="{StaticResource H2}" />
                                                     <TextBlock Text="{Binding EntryCount, StringFormat='共 {0} 项设置'}"
