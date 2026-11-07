@@ -86,7 +86,6 @@ public static class PresetStore
         public string? Source { get; set; }
         public string? Description { get; set; }
         public string? Highlights { get; set; }
-        public string? Avatar { get; set; }
         public List<PresetEntry>? Settings { get; set; }
         public List<PresetEntry>? Video { get; set; }
     }
@@ -106,8 +105,7 @@ public static class PresetStore
                 p.Description ?? string.Empty,
                 p.Highlights ?? string.Empty,
                 (p.Settings ?? new List<PresetEntry>()).Where(e => e is not null && !string.IsNullOrWhiteSpace(e.Key)).ToArray(),
-                (p.Video ?? new List<PresetEntry>()).Where(e => e is not null && !string.IsNullOrWhiteSpace(e.Key)).ToArray())
-                with { Avatar = (p.Avatar ?? string.Empty).Trim() })
+                (p.Video ?? new List<PresetEntry>()).Where(e => e is not null && !string.IsNullOrWhiteSpace(e.Key)).ToArray()))
             .ToList();
     }
 }

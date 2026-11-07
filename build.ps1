@@ -6,6 +6,7 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 $project = Join-Path $root "ApexToolbox\ApexToolbox.csproj"
 $portableDir = Join-Path $root "dist\portable"
+$liteDir = Join-Path $root "dist\lite"
 
 dotnet publish $project -c Release -r win-x64 --self-contained true `
     -p:PublishSingleFile=true `
@@ -18,8 +19,19 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
+# 轻量版：不打包 .NET 运行时，需本机安装 .NET 10 桌面运行时
+dotnet publish $project -c Release -r win-x64 --self-contained false `
+    -p:PublishSingleFile=true `
+    -o $liteDir
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "轻量版发布失败。"
+    exit $LASTEXITCODE
+}
+
 Write-Host ""
-Write-Host "便携版已输出到: $portableDir" -ForegroundColor Green
+Write-Host "自包含版已输出到: $portableDir" -ForegroundColor Green
+Write-Host "轻量版已输出到: $liteDir" -ForegroundColor Green
 
 if (-not $Installer) { exit 0 }
 

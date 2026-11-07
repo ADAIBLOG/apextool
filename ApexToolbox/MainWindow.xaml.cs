@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,7 +26,7 @@ public partial class MainWindow : Window
     };
 
     private readonly ObservableCollection<ImportRow> _importRows = new();
-    private readonly ObservableCollection<ImportRow> _detailRows = new();
+    private readonly ObservableCollection<CfgLine> _detailCfgLines = new();
     private readonly ObservableCollection<BackupEntry> _backups = new();
 
     private string? _folder;
@@ -41,7 +40,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         DiffItemsHost.ItemsSource = _importRows;
-        DetailItemsHost.ItemsSource = _detailRows;
+        DetailCfgHost.ItemsSource = _detailCfgLines;
         BackupItemsHost.ItemsSource = _backups;
         LaunchItemsHost.ItemsSource = SettingCatalog.LaunchGroups;
         var cached = PresetStore.Load();
@@ -686,40 +685,47 @@ public partial class MainWindow : Window
     {
         if (sender is not Button button || button.Tag is not GamePreset preset) return;
 
-        _detailRows.Clear();
-        foreach (var entry in preset.Settings)
-            _detailRows.Add(BuildImportRow(entry.Key, entry.Value, "settings", BasicVideoKeys.Contains(entry.Key)));
-        foreach (var entry in preset.Video)
-            _detailRows.Add(BuildImportRow(entry.Key, entry.Value, "videoconfig", true));
+        _detailCfgLines.Clear();
+        foreach (var line in BuildPresetCfgLines(preset)) _detailCfgLines.Add(line);
 
         DetailTitleText.Text = preset.Name;
         DetailSubText.Text = $"{preset.Source} · 共 {preset.EntryCount} 项设置 · 与当前配置对比，重启游戏后生效";
-        DetailCfgBox.Text = BuildPresetCfg(preset);
         ShowPage("preset-detail");
     }
 
     private void PresetBack_Click(object sender, RoutedEventArgs e) => ShowPage("preset");
 
-    /// <summary>把玩家模板还原成可直接对照的 cfg 文本。</summary>
-    private static string BuildPresetCfg(GamePreset preset)
+    /// <summary>把玩家模板还原成可直接对照的 cfg 文本，每行右侧附上仅用于阅读的说明。</summary>
+    private static List<CfgLine> BuildPresetCfgLines(GamePreset preset)
     {
-        var builder = new StringBuilder();
-        builder.AppendLine($"// {preset.Name} · {preset.Source}");
+        var lines = new List<CfgLine>();
 
         if (preset.Settings.Count > 0)
         {
-            builder.AppendLine("// settings.cfg");
+            lines.Add(new CfgLine { Text = "// settings.cfg" });
             foreach (var entry in preset.Settings)
-                builder.AppendLine($"\"{entry.Key}\"\t\t\"{entry.Value}\"");
-            builder.AppendLine();
+            {
+                lines.Add(new CfgLine
+                {
+                    Text = $"\"{entry.Key}\"\t\t\"{entry.Value}\"",
+                    Comment = KeyGlossary.Annotate(entry.Key, entry.Value),
+                });
+            }
+            lines.Add(new CfgLine());
         }
 
-        builder.AppendLine("\"VideoConfig\"");
-        builder.AppendLine("{");
+        lines.Add(new CfgLine { Text = "\"VideoConfig\"" });
+        lines.Add(new CfgLine { Text = "{" });
         foreach (var entry in preset.Video)
-            builder.AppendLine($"\t\"{entry.Key}\"\t\t\"{entry.Value}\"");
-        builder.AppendLine("}");
-        return builder.ToString();
+        {
+            lines.Add(new CfgLine
+            {
+                Text = $"\t\"{entry.Key}\"\t\t\"{entry.Value}\"",
+                Comment = KeyGlossary.Annotate(entry.Key, entry.Value),
+            });
+        }
+        lines.Add(new CfgLine { Text = "}" });
+        return lines;
     }
 
     /// <summary>把现有配置文件设为只读，并同步界面上的只读开关。</summary>

@@ -20,3 +20,12 @@ public sealed class ImportRow
     public string ChangeText => Same ? "无变化" : Exists ? "修改" : "新增";
     public bool HasChange => !Same;
 }
+
+/// <summary>详情页里的一行 cfg 文本，右侧附带仅用于阅读的注释。</summary>
+public sealed class CfgLine
+{
+    public string Text { get; init; } = string.Empty;
+    public string Comment { get; init; } = string.Empty;
+
+    public string CommentDisplay => Comment.Length == 0 ? string.Empty : $"// {Comment}";
+}

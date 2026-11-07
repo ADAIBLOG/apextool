@@ -23,7 +23,7 @@ DisableProgramGroupPage=yes
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加任务:"; Flags: unchecked
 
 [Files]
-Source: "dist\portable\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "dist\lite\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -31,3 +31,31 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "启动 {#MyAppName}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+function HasDotnetDesktopRuntime: Boolean;
+var
+  FindRec: TFindRec;
+begin
+  Result := False;
+  if FindFirst(ExpandConstant('{commonpf64}\dotnet\shared\Microsoft.WindowsDesktop.App\10.*'), FindRec) then
+  begin
+    Result := True;
+    FindClose(FindRec);
+  end;
+end;
+
+function InitializeSetup: Boolean;
+var
+  ErrorCode: Integer;
+begin
+  Result := HasDotnetDesktopRuntime;
+  if not Result then
+  begin
+    if MsgBox('Apex Toolbox 需要 Microsoft .NET 10 桌面运行时（Desktop Runtime）。' + #13#10#13#10 +
+              '本机尚未安装或版本低于 10，是否打开微软官方下载页面？' + #13#10 +
+              '安装完成后请重新运行本安装程序。',
+              mbConfirmation, MB_YESNO) = IDYES then
+      ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/10.0', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+  end;
+end;

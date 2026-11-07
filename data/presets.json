@@ -7,7 +7,6 @@
       "source": "玩家提供的 videoconfig",
       "description": "玩家 noname 的完整视频配置：关闭阴影、SSAO、体积光与动态分辨率，模型细节 0.6，兼顾清晰度与帧数。",
       "highlights": "阴影 / SSAO / 体积光全关，LOD 0.6，全屏 1920×1440",
-      "avatar": "https://raw.githubusercontent.com/ADAIBLOG/apextool/main/data/avatar.jpg",
       "settings": [],
       "video": [
         { "key": "setting.cl_gib_allow", "value": "0" },

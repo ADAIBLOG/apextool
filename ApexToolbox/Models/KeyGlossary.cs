@@ -15,7 +15,7 @@ public static class KeyGlossary
         ["setting.mat_triplebuffered"] = new("三重缓冲", "开启会增加显存占用与延迟，通常建议关闭", "开启", "关闭"),
         ["setting.mat_monitorgamma"] = new("亮度（gamma）", "数值越高画面越亮，常用 2.2"),
         ["setting.cl_fovScale"] = new("视野（FOV）缩放", "1.0 约等于 70°，数值越大视野越广"),
-        ["setting.cl_gib_allow"] = new("死亡特效（肢体碎块）", "关闭后击杀特效更简单，可减少特效开销", "显示", "关闭"),
+        ["setting.cl_gib_allow"] = new("肢体特效（死亡碎块）", "关闭后击杀特效更简单，可减少特效开销", "显示", "关闭"),
         ["setting.r_lod_switch_scale"] = new("模型细节 LOD", "数值越低远景模型越简化，帧数越高"),
         ["setting.mat_depth_feather_scale"] = new("深度羽化", "影响远景边缘柔和度，越低渲染开销越小"),
         ["setting.cl_particle_fallback_base"] = new("粒子回退基准", "越低爆炸、烟雾等粒子效果越简单"),
@@ -62,25 +62,18 @@ public static class KeyGlossary
         ["setting.map_detail_level"] = new("地图细节等级", "数值越低场景装饰物越少"),
     };
 
+    /// <summary>cfg 展示用的一句话注释，例如「肢体特效：关闭」。</summary>
+    public static string Annotate(string key, string value)
+    {
+        var entry = Resolve(key);
+        if (entry.On != null && entry.Off != null)
+            return $"{entry.Name}：{(value is "1" or "true" ? entry.On : entry.Off)}";
+        return entry.Name;
+    }
+
     public static (string Name, string Hint) Describe(string key, string value)
     {
-        Entry? entry = Map.TryGetValue(key, out var found) ? found : null;
-
-        if (entry == null)
-        {
-            var lowered = key.ToLowerInvariant();
-            entry = lowered switch
-            {
-                _ when lowered.Contains("particle") => new Entry("粒子效果", "与爆炸、烟雾等粒子渲染相关"),
-                _ when lowered.Contains("shadow") => new Entry("阴影质量", "控制阴影分辨率与渲染开销"),
-                _ when lowered.Contains("picmip") || lowered.Contains("texture") => new Entry("纹理质量", "控制纹理清晰度与显存占用"),
-                _ when lowered.Contains("fov") => new Entry("视野", "影响可见范围"),
-                _ when lowered.Contains("vsync") => new Entry("垂直同步", "控制画面同步"),
-                _ when lowered.Contains("mouse") => new Entry("鼠标设置", "与鼠标灵敏度或加速相关"),
-                _ when lowered.Contains("fps") => new Entry("帧率设置", "与帧率上限或显示相关"),
-                _ => new Entry("其他参数", "未收录说明，按原键值写入"),
-            };
-        }
+        var entry = Resolve(key);
 
         var hint = entry.Hint;
         if (entry.On != null && entry.Off != null)
@@ -94,5 +87,23 @@ public static class KeyGlossary
         }
 
         return (entry.Name, hint);
+    }
+
+    private static Entry Resolve(string key)
+    {
+        if (Map.TryGetValue(key, out var found)) return found;
+
+        var lowered = key.ToLowerInvariant();
+        return lowered switch
+        {
+            _ when lowered.Contains("particle") => new Entry("粒子效果", "与爆炸、烟雾等粒子渲染相关"),
+            _ when lowered.Contains("shadow") => new Entry("阴影质量", "控制阴影分辨率与渲染开销"),
+            _ when lowered.Contains("picmip") || lowered.Contains("texture") => new Entry("纹理质量", "控制纹理清晰度与显存占用"),
+            _ when lowered.Contains("fov") => new Entry("视野", "影响可见范围"),
+            _ when lowered.Contains("vsync") => new Entry("垂直同步", "控制画面同步"),
+            _ when lowered.Contains("mouse") => new Entry("鼠标设置", "与鼠标灵敏度或加速相关"),
+            _ when lowered.Contains("fps") => new Entry("帧率设置", "与帧率上限或显示相关"),
+            _ => new Entry("其他参数", "未收录说明，按原键值写入"),
+        };
     }
 }

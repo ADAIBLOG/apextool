@@ -12,12 +12,6 @@ public sealed record GamePreset(
     IReadOnlyList<PresetEntry> Video)
 {
     public int EntryCount => Settings.Count + Video.Count;
-
-    /// <summary>头像上显示的首字。</summary>
-    public string Initial => string.IsNullOrWhiteSpace(Name) ? "?" : Name.Trim()[..1];
-
-    /// <summary>玩家头像地址；为空时显示首字头像。</summary>
-    public string Avatar { get; init; } = string.Empty;
 }
 
 /// <summary>玩家提供的配置模板；只写入当前配置中已存在的键。</summary>
@@ -75,9 +69,6 @@ public static class PresetCatalog
                 new PresetEntry("setting.gamma", "0.817857"),
                 new PresetEntry("setting.configversion", "9"),
                 new PresetEntry("setting.map_detail_level", "1"),
-            })
-        {
-            Avatar = "https://raw.githubusercontent.com/ADAIBLOG/apextool/main/data/avatar.jpg",
-        },
+            }),
     };
 }

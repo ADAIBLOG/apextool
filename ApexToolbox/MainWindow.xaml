@@ -97,55 +97,23 @@
                             </Grid>
                         </Border>
                         <ItemsControl x:Name="PresetItemsHost">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Columns="2" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource Card}" Margin="0,0,8,8">
-                                        <StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Grid Width="64" Height="64">
-                                                    <Border CornerRadius="32">
-                                                        <Border.Background>
-                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                                <GradientStop Color="#E23B2E" Offset="0" />
-                                                                <GradientStop Color="#7A1B14" Offset="1" />
-                                                            </LinearGradientBrush>
-                                                        </Border.Background>
-                                                    </Border>
-                                                    <Border CornerRadius="32" ClipToBounds="True">
-                                                        <Border.Background>
-                                                            <ImageBrush ImageSource="{Binding Avatar}" Stretch="UniformToFill" />
-                                                        </Border.Background>
-                                                    </Border>
-                                                    <TextBlock Text="{Binding Initial}" FontSize="28" FontWeight="Bold" Foreground="White"
-                                                               HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Avatar}" Value="">
-                                                                        <Setter Property="Visibility" Value="Visible" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
-                                                </Grid>
-                                                <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource H2}" />
-                                                    <TextBlock Text="{Binding EntryCount, StringFormat='共 {0} 项设置'}"
-                                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
-                                                </StackPanel>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                                    <Border Style="{StaticResource Card}" Margin="0,0,0,8" Padding="14,10"
+                                            HorizontalAlignment="Left" MinWidth="240" MaxWidth="320">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" Style="{StaticResource H2}"
+                                                       HorizontalAlignment="Center" TextAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding EntryCount, StringFormat='共 {0} 项设置'}"
+                                                       Style="{StaticResource Caption}" Margin="0,2,0,0"
+                                                       HorizontalAlignment="Center" TextAlignment="Center" />
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0"
+                                                        HorizontalAlignment="Center">
                                                 <Button Content="一键使用" Style="{StaticResource PrimaryButton}"
-                                                        Padding="14,7" Tag="{Binding}" Click="ApplyPreset_Click" />
+                                                        Padding="12,5" Tag="{Binding}" Click="ApplyPreset_Click" />
                                                 <Button Content="详情" Style="{StaticResource GhostButton}"
-                                                        Margin="8,0,0,0" Tag="{Binding}" Click="PresetDetail_Click" />
+                                                        Padding="12,5" Margin="8,0,0,0" Tag="{Binding}" Click="PresetDetail_Click" />
                                             </StackPanel>
                                         </StackPanel>
                                     </Border>
@@ -176,52 +144,32 @@
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <TextBlock Text="cfg 文件内容" Style="{StaticResource H2}" />
-                                <TextBlock Text="按该玩家的配置生成的 videoconfig 内容，可直接对照游戏文件。"
+                                <TextBlock Text="按该玩家的配置生成的 videoconfig 内容，可直接对照游戏文件；灰色注释仅为说明，不属于文件内容。"
                                            Style="{StaticResource Caption}" Margin="0,4,0,10" />
-                                <TextBox x:Name="DetailCfgBox" Style="{StaticResource DarkTextBox}" Height="240"
-                                         IsReadOnly="True" FontFamily="Consolas" TextWrapping="NoWrap"
-                                         HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                                <Border Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource BorderBrush2}"
+                                        BorderThickness="1" CornerRadius="8" Padding="12,8">
+                                    <ItemsControl x:Name="DetailCfgHost">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" MinWidth="320" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Text}" FontFamily="Consolas" FontSize="12"
+                                                               Foreground="{StaticResource TextBrush}" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding CommentDisplay}"
+                                                               FontFamily="Consolas" FontSize="12"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               Margin="18,0,0,0" TextWrapping="Wrap" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
-                                <TextBlock Text="每条设置改了什么" Style="{StaticResource H2}" />
-                                <ItemsControl x:Name="DetailItemsHost" Margin="0,10,0,0">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Style="{StaticResource RowBorder}">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding Name}" Style="{StaticResource Body}" FontWeight="SemiBold" />
-                                                        <TextBlock Style="{StaticResource Caption}" FontFamily="Consolas" Margin="0,3,0,0">
-                                                            <Run Text="{Binding Key}" />
-                                                            <Run Text=" · " />
-                                                            <Run Text="{Binding TargetText}" />
-                                                        </TextBlock>
-                                                        <TextBlock Text="{Binding Hint}" Style="{StaticResource Caption}"
-                                                                   TextWrapping="Wrap" Margin="0,4,0,0" MaxWidth="620" />
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Column="1" Orientation="Horizontal"
-                                                                VerticalAlignment="Center" Margin="16,0,0,0">
-                                                        <TextBlock Text="{Binding CurrentDisplay}" Style="{StaticResource Caption}"
-                                                                   FontFamily="Consolas" VerticalAlignment="Center" />
-                                                        <TextBlock Text=" → " Foreground="{StaticResource MutedBrush}"
-                                                                   VerticalAlignment="Center" />
-                                                        <TextBlock Text="{Binding Value}" Style="{StaticResource Body}"
-                                                                   FontFamily="Consolas" VerticalAlignment="Center" />
-                                                    </StackPanel>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
                     </StackPanel>
                 </ScrollViewer>
 
